@@ -274,8 +274,8 @@ function Init() {
 	BPGN_TIMECTRL = "TimeControl"; // BPGN timecontrol tag string
 	BPGN_RESULT = "Result"; // BPGN result tag string
 
-	DEFAULT_EVENT = "bics rated bughouse match";
-	DEFAULT_SITE = "doublechess server, Czech Republic Europe";
+	DEFAULT_EVENT = "Bughouse study";
+	DEFAULT_SITE = "https://bmacho.github.io/bughouse-viewer/view.html";
 	DEFAULT_DATE = "????.??.??";
 	DEFAULT_WHITEA = "WhiteA";
 	DEFAULT_BLACKA = "BlackA";
