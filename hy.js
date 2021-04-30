@@ -1643,8 +1643,16 @@ function refreshinfo() {
 	t+='Event: '+this.gameevent+'\n';
 	t+='Site: '+this.gamesite+'\n';
 	v.info.value=t;*/
-	s = ((this.currentmove == this.endnode) ? this.cResult1 + ' ' + this.gameresult + '\n\n' : '');
-	v.comment.value = s + this.BPGN[this.currentmove].cNote;
+
+	// this puts the results into the final note, if there is no final note already
+	// this definitely should not be cheked and handled by the viewer function
+	if (this.currentmove == this.endnode) {
+		if (!this.BPGN[this.currentmove].cNote) { 
+			this.BPGN[this.currentmove].cNote = this.cResult1 + ' ' + this.gameresult
+		}
+	}	 
+
+	v.comment.value = this.BPGN[this.currentmove].cNote;
 	for (i = 0; i < n; i++) {
 		j = this.BPGN[this.currentmove].nNext[i];
 		s = this.BPGN[j].cMove + this.BPGN[j].cAnno;
