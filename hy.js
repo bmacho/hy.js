@@ -16,6 +16,10 @@ var viewerversion = '0.43icc.LagPrepIgn001';
 //here are functions that can call functions, variables outside viewer
 //for example if u wish connect viewer with chat u put here calling chat.fce
 
+function saveNote( noteText ) {
+	v1.BPGN[v1.currentmove].cNote = noteText
+}
+
 var ClientLastMadeMove = "00X"; //here will be 10A , 5a, 17B etc.
 var BroadscastMove = true;
 this.eventedmousedown = false;
@@ -4778,7 +4782,7 @@ function drawinfo(color) {
 	for (i = 0; i < MAX_NEXT; i++) opt = opt + '<option>';
 	t = t + '<option>' + ph + opt;
 	t = t + '</select></td>';
-	t = t + '<td valign="top"><textarea name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
+	t = t + '<td valign="top"><textarea onchange="saveNote(this.value)" name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
 	t = t + '</tr>';
 	t = t + '</table></center>';
 	return t;
