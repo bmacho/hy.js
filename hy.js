@@ -2827,8 +2827,8 @@ function BPGN_SaveGame() {
 	this.sgame += '[Result "' + this.gameresult + '"]\n';
 
 	this.sgame += '[Setup "1"]\n';
-	this.sgame += '[FEN "' + this.a.generatebfen() + ' | ' + this.b.generatebfen() + '"]\n';
 
+	this.sgame += '[FEN "' + this.a.initial_bfen + ' | ' + this.b.initial_bfen + '"]\n';
 	this.sgame += '\n';
 
 
@@ -4592,6 +4592,8 @@ function loadboard(bfen, whitepl, blackpl, welo, belo, timecontrol) {
 	};
 	this.kingw = this.findpiece('wk', 0);
 	this.kingb = this.findpiece('bk', 0);
+	
+	this.initial_bfen = this.generatebfen()
 }
 
 function asssave(viewer) {
