@@ -4769,7 +4769,7 @@ function drawinfo(color) {
 	for (i = 0; i < NEXT_WIDTH; i++) ph += 'x';
 	t = t + '<center><table border="0" cellpadding="0" cellspacing="0" bgcolor="' + color + '">';
 	t = t + '<tr>';
-	t = t + '<td align="center" valign="top"><strong>Next</strong></td>';
+	t = t + '<td align="center" valign="top"><strong>Variations</strong></td>';
 	t = t + '<td align="center" valign="top"><strong>Comment</strong></td>';
 	t = t + '</tr>';
 	t = t + '<tr>';
