@@ -4651,7 +4651,7 @@ function drawcontrol(color, mode) {
 	var vd = (this.numboard == 1) ? this.vwidth : 2 * this.vwidth;
 	var bc = 5;
 
-	var t = '<center><table border="0" cellpadding="0" cellspacing="0" width="' + vd + '" bgcolor="' + color + '">';
+	var t = '<center style="display: none;"><table border="0" cellpadding="0" cellspacing="0" width="' + vd + '" bgcolor="' + color + '">';
 
 	t += '<tr>';
 	t += '<td align="left" valign="top" style="font: 13px arial narrow, sans-serif;">';
@@ -4746,7 +4746,7 @@ function drawcontrol(color, mode) {
 	t += '<input type="button" value=" >| " onclick="assforward(999,' + "'c','" + this.viewername + "'" + ',0)">';
 	t += '</td>';
 	t += '<td align="center" valign="bottom">';
-	t += '<input type="button" value=" X " onclick="assdelete(' + "'" + this.viewername + "'" + ')">';
+	t += '<input style="display: none;" type="button" value=" X " onclick="assdelete(' + "'" + this.viewername + "'" + ')">';
 	var bz;
 	if (this.capturemode == 'bug') {
 		bz = 'B=>Z';
@@ -4761,9 +4761,9 @@ function drawcontrol(color, mode) {
 			bz = 'C=>B'
 		};
 	};
-	t += '<input type="button" name="bugzh" value="' + bz + '" onclick="bugorzh(' + "'" + this.viewername + "'" + ')">';
+	t += '<input style="display: none;" type="button" name="bugzh" value="' + bz + '" onclick="bugorzh(' + "'" + this.viewername + "'" + ')">';
 	t += '<input type="button" value="Flip" onclick="flipboard(' + "'" + this.viewername + "'" + ')">';
-	t += '<input type="button" id="Pref" value="Pref" onclick="Preferences(' + "'" + this.viewername + "'" + ')">';
+	t += '<input style="display: none;" type="button" id="Pref" value="Pref" onclick="Preferences(' + "'" + this.viewername + "'" + ')">';
 	t += '<input type="button" value="Save" onclick="asssave(' + "'" + this.viewername + "'" + ')">';
 	t += '<input type="button" value="Load" onclick="assloadgame(\'' + this.viewername + '\')">';
 	t += '</td>';
@@ -4796,7 +4796,10 @@ function drawinfo(color) {
 	for (i = 0; i < MAX_NEXT; i++) opt = opt + '<option>';
 	t = t + '<option>' + ph + opt;
 	t = t + '</select></td>';
-	t = t + '<td valign="top"><textarea onchange="saveNote(this.value,' + "'" + this.viewername + "'" + ')" name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
+	t = t + '<td rowspan="2" valign="top"><textarea onchange="saveNote(this.value,' + "'" + this.viewername + "'" + ')" name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
+	t = t + '</tr>';
+	t = t + '<tr>';
+	t = t + '<td align="center" valign="top"> <a href="javascript:void(0)" onclick="assdelete(' + "'" + "v1" + "'" + ')">Delete move</a> </td>';
 	t = t + '</tr>';
 	t = t + '</table></center>';
 	return t;
