@@ -1862,7 +1862,8 @@ function gettoken() {
 			}
 			// comment token state
 			if (this.nstate == BPGN_COMMENT2) {
-				if ((this.cgame.charAt(ni) == CR_ASCII_NUM) || (this.cgame.charAt(ni) == LF_ASCII_NUM)) continue;
+				// if ((this.cgame.charAt(ni) == CR_ASCII_NUM) || (this.cgame.charAt(ni) == LF_ASCII_NUM)) continue;
+				// ^-- it forgets the newline characters in the notes, we don't want that
 
 				if (this.cgame.charAt(ni) == '}') {
 					this.nstate = BPGN_NORMAL;
