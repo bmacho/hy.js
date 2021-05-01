@@ -3233,7 +3233,7 @@ function drawboard() /* generates html for the board */ {
 		t += '<br>';
 	};
 	tmp += t;
-	tmp += "<textarea readonly disabled id='dntells" + bd + "' rows=2 cols=10 value=\"bubu\"></textarea>";
+	tmp += "<textarea style='display: none;' readonly disabled id='dntells" + bd + "' rows=2 cols=10 value=\"bubu\"></textarea>";
 	tmp = tmp + '</td> </tr> </table> </center> ';
 	tmp = tmp + '<table border="0" cellpadding="0" width="100%">';
 	tmp = tmp + '<tr>';
