@@ -17,12 +17,13 @@ var viewerversion = '0.43icc.LagPrepIgn001';
 //for example if u wish connect viewer with chat u put here calling chat.fce
 
 
-function saveNote( noteText , game_name_string) {
+function saveNote(game_name_string) {
 	// saves the note to the current positions cNote
 	
 	// saveNote is a global function, so we pass the game name to it in a string 
 	let game = eval(game_name_string)
-	game.BPGN[game.currentmove].cNote = noteText
+	let v = eval('window.document.' + game_name_string) // textarea doesnt have an id, it only has a name, so we must refer it with DOM objects 
+	game.BPGN[game.currentmove].cNote = v.comment.value// the textarea is called "comment"
 }
 
 
@@ -3939,6 +3940,9 @@ function execmove(bd, text) {
 	 King related legality checking is done inside the functions that handle special cases 
 	 (dropmove, enpassant, regularmove, promotion, castle) 
 	*/
+	
+	saveNote(this.viewername) // for some reason the comment textarea onchange doesn't call when we move a piece by hand, so we call savenote here
+	
 	var move = extractmove(text);
 	var tbd = eval('this.' + bd);
 	var mv = this.decryptmove(tbd, move);
@@ -4797,7 +4801,7 @@ function drawinfo(color) {
 	for (i = 0; i < MAX_NEXT; i++) opt = opt + '<option>';
 	t = t + '<option>' + ph + opt;
 	t = t + '</select></td>';
-	t = t + '<td rowspan="2" valign="top"><textarea onchange="saveNote(this.value,' + "'" + this.viewername + "'" + ')" name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
+	t = t + '<td rowspan="2" valign="top"><textarea onchange="saveNote(' + "'" + this.viewername + "'" + ')" name="comment"' + ((IE) ? ' ' : ' WRAP="SOFT" ') + 'value="" rows="5" cols="' + this.cwidth + '"></textarea></td>';
 	t = t + '</tr>';
 	t = t + '<tr>';
 	t = t + '<td align="center" valign="top"> <a href="javascript:void(0)" onclick="assdelete(' + "'" + "v1" + "'" + ')">Delete move</a> </td>';
