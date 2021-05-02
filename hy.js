@@ -27,7 +27,7 @@ function saveNote( noteText , game_name_string) {
 
 
 var ClientLastMadeMove = "00X"; //here will be 10A , 5a, 17B etc.
-var BroadscastMove = true;
+var BroadscastMove = false;
 this.eventedmousedown = false;
 
 
