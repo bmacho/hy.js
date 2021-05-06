@@ -185,14 +185,51 @@ function interfacePtell(txtmsg) {
 }
 
 
-function sqHighlight(bd, ind, highlight) { //Wir: highlight or unhighlight a square; bd = board, ind = square index, highlight true=highlight, false=unhighlight
-	var lid = 'tdsquare' + bd + String(ind);
-	var lobj = document.getElementById(lid).style.backgroundImage;
-	lobj = highlight ? lobj.replace('tr.gif', 'fr.gif') : lobj.replace('fr.gif', 'tr.gif');
-	document.getElementById(lid).style.backgroundImage = lobj;
+function Highlight (...indices) { 
+	// saves highlighted squares
+	// handles flips
+	// attached to the boards (a and b)
+	
+	let brdId = this.boardname
+	let flip = this.flip
+	
+	this.unHighlightAll()
+	this.highlightedSquares = []
+	
+	for (let ind of indices) {
+		this.highlightedSquares.push(ind)
+		
+		ind = (flip) ? (63-ind) : (ind)
+		sqHighlight(brdId, ind, true )
+	}  
 }
 
+function sqHighlight(bd, ind, highlight) { 
+	// highlights or unhighlights a square
+	// don't call it direct, use the Highlight function
+	//Wir: highlight or unhighlight a square; bd = board, ind = square index, highlight true=highlight, false=unhighlight
+	var sqId = 'tdsquare' + bd + String(ind)
+	var lobj = document.getElementById(sqId).style.backgroundImage
 
+	if ( highlight ) {
+		lobj = lobj.replace('tr.gif', 'fr.gif')
+	} else {
+		lobj = lobj.replace('fr.gif', 'tr.gif')
+	}
+	
+	document.getElementById(sqId).style.backgroundImage = lobj
+}
+
+function unHighlightAll() {
+
+	let brdId = this.boardname
+
+	for (ind = 0; ind <= 63; ind++) {
+		sqHighlight(brdId, ind, false )
+	}
+	
+	this.highlightedSquares = []
+}
 
 // Javascript bughouse viewer v 1.01 (C) Sergiy Vasylkevych aka Fermy on FICS
 // Feel free to use/copy/modify/distribute 
@@ -1681,6 +1718,79 @@ function refreshinfo() {
 	};
 	v.nextmove.options[MAX_NEXT].text = 'XXXXXXXXXXX';
 	v.nextmove.options[0].selected = true;
+	
+
+}
+
+function refreshhighlight() {
+
+// we don't want to run our function when things do not exist:
+
+	if (!v1.a) return;
+	if (!v1.b) return;
+	if (!v1.BPGN) return;
+	if (!v1.currentmove) return;
+	if (!v1.BPGN[v1.currentmove].dmove) return;  
+
+// 
+
+	let currentNode = this.BPGN[this.currentmove] 
+	let boardId = currentNode.dmove.board
+	let boardObj = eval(this.viewername + "." + boardId)
+
+// unhighlight the whole board (only one where the currentmove happened)
+
+	boardObj.unHighlightAll()
+
+// get the moves to highlight
+
+	let fromSquare = currentNode.dmove.fromsquare 
+	let toSquare = currentNode.dmove.tosquare 
+	
+// some cases, according to the move type
+
+	// it's a dropmove: 
+	if ( typeof fromSquare === 'number' && fromSquare == 65 ) { 
+		boardObj.Highlight( toSquare )
+	}
+	
+	// it's a normal move:
+
+	if ( typeof fromSquare === 'number' && fromSquare <= 63 &&
+		 typeof toSquare === 'number' && toSquare <= 63) {
+		boardObj.Highlight( fromSquare, toSquare )
+	}
+	
+	// short castle:
+	
+	if ( fromSquare == "o-o" ) {
+		if ( currentNode.dmove.side == "w" ) {
+				boardObj.Highlight(61, 62)
+			}
+		
+		if ( currentNode.dmove.side == "b" ) {
+				boardObj.Highlight(5, 6)
+			}	
+	}
+		
+		// long castle:
+		
+		if ( fromSquare == "o-o-o" ) { // short castle
+			if ( currentNode.dmove.side == "w" ) {
+				boardObj.Highlight(58, 59)
+			}
+			
+			if ( currentNode.dmove.side == "b" ) {
+				boardObj.Highlight(2,3)
+			}	
+		}
+	
+	function flip( ind ) { 
+		if (boardFlipped) {
+			ind = 63 - ind
+		}
+		return ind
+	}
 }
 
 function NODE() {
@@ -3834,6 +3944,7 @@ function assforward(num, bd, viewer, opt) {
 	while (f < num) {
 		if (v.BPGN[v.currentmove].nNext.length < opt + 1) {
 			v.refreshinfo();
+			v.refreshhighlight()
 			return;
 		};
 		moveind = v.BPGN[v.currentmove].nNext[opt];
@@ -3854,6 +3965,7 @@ function assforward(num, bd, viewer, opt) {
 	};
 	v.refreshclock();
 	v.refreshinfo();
+	v.refreshhighlight()
 }
 
 function assundomove(num, bd, viewer) {
@@ -3984,35 +4096,7 @@ function execmove(bd, text) {
 
 		//try
 		//{
-		if (tbd.highligtedsqto >= 0 && tbd.highligtedsqto <= 63) {
-			lid = "tdsquare" + mv.board + ((tmp1) ? tbd.highligtedsqto : 63 - tbd.highligtedsqto);
 
-			lobj = document.getElementById(lid).style.backgroundImage;
-			ltmp = lobj.replace("fr.gif", "tr.gif"); //frame unhighlited        
-			document.getElementById(lid).style.backgroundImage = ltmp;
-			tbd.highligtedsqto = -1;
-		}
-		if (tbd.highligtedsqfrom >= 0 && tbd.highligtedsqfrom <= 63) {
-			lid = "tdsquare" + mv.board + ((tmp1) ? tbd.highligtedsqfrom : 63 - tbd.highligtedsqfrom);
-			lobj = document.getElementById(lid).style.backgroundImage;
-			ltmp = lobj.replace("fr.gif", "tr.gif"); //frame unhighlited        
-			document.getElementById(lid).style.backgroundImage = ltmp;
-			tbd.highligtedsqfrom = -1;
-		}
-		if (mv.tosquare >= 0 && mv.tosquare <= 63) {
-			lid = "tdsquare" + mv.board + ((tmp1) ? mv.tosquare : 63 - mv.tosquare);
-			lobj = document.getElementById(lid).style.backgroundImage;
-			ltmp = lobj.replace("tr.gif", "fr.gif"); //frame highlited        
-			document.getElementById(lid).style.backgroundImage = ltmp;
-			tbd.highligtedsqto = mv.tosquare;
-		}
-		if (mv.fromsquare >= 0 && mv.fromsquare <= 63) {
-			lid = "tdsquare" + mv.board + ((tmp1) ? mv.fromsquare : 63 - mv.fromsquare);
-			lobj = document.getElementById(lid).style.backgroundImage;
-			ltmp = lobj.replace("tr.gif", "fr.gif"); //frame highlited        
-			document.getElementById(lid).style.backgroundImage = ltmp;
-			tbd.highligtedsqfrom = mv.fromsquare;
-		}
 		// }
 		// catch(err) 
 		// { interfaceLogDebug(err.message);
@@ -4030,7 +4114,7 @@ function execmove(bd, text) {
 	}
 	this.refreshclock();
 	this.refreshinfo();
-
+	this.refreshhighlight()
 }
 
 
@@ -4106,6 +4190,7 @@ function undomove() {
 	};
 	this.refreshclock();
 	this.refreshinfo();
+	this.refreshhighlight()
 }
 
 function bugorzh(viewer) {
@@ -4143,48 +4228,6 @@ function flipboard(viewer) {
 
 	//try
 	//{
-
-	if (v.a.highligtedsqto >= 0 && v.a.highligtedsqto <= 63) {
-		lid = "tdsquarea" + (v.a.flip == 0 ? v.a.highligtedsqto : 63 - v.a.highligtedsqto);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("fr.gif", "tr.gif"); //frame unhighlited        
-		document.getElementById(lid).style.backgroundImage = ltmp;
-		lid = "tdsquarea" + (v.a.flip == 1 ? v.a.highligtedsqto : 63 - v.a.highligtedsqto);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("tr.gif", "fr.gif"); //frame highlited        
-		document.getElementById(lid).style.backgroundImage = ltmp;
-	}
-	if (v.a.highligtedsqfrom >= 0 && v.a.highligtedsqfrom <= 63) {
-		lid = "tdsquarea" + (v.a.flip == 0 ? v.a.highligtedsqfrom : 63 - v.a.highligtedsqfrom);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("fr.gif", "tr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-		lid = "tdsquarea" + (v.a.flip == 1 ? v.a.highligtedsqfrom : 63 - v.a.highligtedsqfrom);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("tr.gif", "fr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-	}
-	if (v.b.highligtedsqto >= 0 && v.b.highligtedsqto <= 63) {
-		lid = "tdsquareb" + (v.b.flip == 0 ? v.b.highligtedsqto : 63 - v.b.highligtedsqto);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("fr.gif", "tr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-		lid = "tdsquareb" + (v.b.flip == 1 ? v.b.highligtedsqto : 63 - v.b.highligtedsqto);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("tr.gif", "fr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-	}
-	if (v.b.highligtedsqfrom >= 0 && v.b.highligtedsqfrom <= 63) {
-		lid = "tdsquareb" + (v.b.flip == 0 ? v.b.highligtedsqfrom : 63 - v.b.highligtedsqfrom);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("fr.gif", "tr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-		lid = "tdsquareb" + (v.b.flip == 1 ? v.b.highligtedsqfrom : 63 - v.b.highligtedsqfrom);
-		lobj = document.getElementById(lid).style.backgroundImage;
-		ltmp = lobj.replace("tr.gif", "fr.gif");
-		document.getElementById(lid).style.backgroundImage = ltmp;
-	}
-
 
 
 	// }
@@ -4228,6 +4271,14 @@ function flipboard(viewer) {
 		formm.upb.value = v.blackb;
 		formm.dnb.value = v.whiteb;
 	}
+	
+	// redraw the highlights: 
+
+	a_highlights = [...v.a.highlightedSquares]
+	v.a.Highlight(...a_highlights)
+	
+	b_highlights = [...v.b.highlightedSquares]
+	v.b.Highlight(...b_highlights)
 }
 
 
@@ -4580,6 +4631,7 @@ function reloadgame(bpgntext, bfena, bfenb) {
 		this.b.brefreshform();
 	};
 	this.refreshinfo();
+	this.refreshhighlight()
 }
 
 
@@ -4872,6 +4924,7 @@ function drawviewer(color) {
 	document.writeln(tmp);
 	this.setauleft();
 	this.refreshinfo();
+	this.refreshhighlight()
 	this.a.drawpos();
 	if (this.numboard != 1) {
 		this.b.drawpos();
@@ -5198,6 +5251,10 @@ function board(name, dropbar, gifs, viewername, whitepl, blackpl, welo, belo, di
 	this.generateRTFTextPosition = generateRTFTextPosition;
 
 	this.loadboard(bfen, whitepl, blackpl, welo, belo, timecontrol);
+	
+	this.Highlight = Highlight
+	this.unHighlightAll = unHighlightAll;
+	this.highlightedSquares = []
 }
 
 function setmoven() {
@@ -5405,6 +5462,7 @@ function game(the_viewer_name, bpgntext, bfen_pos, capture_mode, number_of_board
 	this.reloadgame = reloadgame;
 	this.refreshclock = refreshclock;
 	this.refreshinfo = refreshinfo;
+	this.refreshhighlight = refreshhighlight
 
 	if (bpgntext.charAt(0) != '@') {
 		tmp = this.getbpgnheaders(bpgntext);
