@@ -1,21 +1,59 @@
-//'use strict';
-//Javascript bughouse double and single chess viewer by Fermy 
-// and modifications, interface by SKAcz
+//Javascript bughouse double viewer by Fermy 
+// modifyied by SKA_cz, Wir,
+// last forked by bmacho
+
+// Feel free to use/copy/modify/distribute 
+
 // by SKAcz & Wir 2015
 //New201801 // V.0003 by SKAcz 201801 Repaired bug in orig Fermy code that was not possible take pawn e.p. when checked king
 // V.0005 by SKAcz, Alamar 202001 Found and repaired big bug that illegal moves wasnt be able played cos bad king pos square was checked. In undocastle fixed.
-var viewerversion = '0.43icc.LagPrepIgn001';
-//interface for Fermy's Javascript bughouse double and single chess viewer 
-//here are functions that can call functions, variables outside viewer
-//for example if u wish connect viewer with chat u put here calling chat.fce
+
+// changelog:
+
+// bmacho:
+
+//	 higlights rewritten, and now they work with every move 
+//	 new debug window
+//	 solved bug that saved the wrong FEN
+//	 renamed the "next move" into "variations
+//	 removed some buttons, clarified the X button
+//	 notes are editable and saveable
+//	 prettified,
 
 
-//Javascript bughouse double and single chess viewer by Fermy 
-// and modifications, interface by SKAcz
-//interface for Fermy's Javascript bughouse double and single chess viewer 
-//here are functions that can call functions, variables outside viewer
-//for example if u wish connect viewer with chat u put here calling chat.fce
+// SKA
+//202104 repair to load also from wild start positions defined by BFEN 2021 SKAcz 
 
+//202103 generateRTFTextPosition, RTF double position using bughousechess font
+
+//202011 BPGNImportRepair1 v001 converting from Chess.com (@d4 into P@d4, {[%clk 0:02:59.9]} into {179.9} )
+
+// 2015.03 Load BPGN from disk file, create download link allowing save as text BPGN to disk 
+
+// 2015.03 piece.toLowerCase() for valid move fast patch now promoted pawn checking also
+
+// 2015.03.04 by SKAcz 
+//    FromGameN(bpgntext,ord) ok now
+//    Interface for connecting to chat etc
+//    Board background,color HTML5, Pref allowing change pieces graphic (gif1 .. gif5)
+//    DisabledInput to not focusing and moving chessboard on smartphones and tablets by opening keyboard but holding screen to play or replay
+//    Last move square highligted, repaired enpassant move
+//    DragDrop and click click on any device pc,even android where no mousedown
+
+
+// 1.1.2010 modified by SKAcz:
+//  added BFEN into save game text, repaired stuff - now added into generated BFEN
+
+// 2003 modified by SKAcz: 
+//   trying Atomic variant support: indevelop now
+
+// 9.2.2002 Hy version 1.1 Ska:
+// Fixed bug when undomove : see function changeturn(step1)
+
+// 2001-04-21 v1.01 Fermy
+
+
+var viewerversion = '2021-05-06';
 
 function log(...args) {
 	// if there is a debugInfo element, it logs there,
@@ -231,31 +269,8 @@ function unHighlightAll() {
 	this.highlightedSquares = []
 }
 
-// Javascript bughouse viewer v 1.01 (C) Sergiy Vasylkevych aka Fermy on FICS
-// Feel free to use/copy/modify/distribute 
-// This update 4.21.2001
-//
-// Modified by SKA, Hy version 1.1   
-// 9.2.2002  Fixed bug when undomove : see function changeturn(step1)
-//
-// 2003 modified by SKAcz: 
-//   trying Atomic variant support: indevelop now
-//
-// 1.1.2010 modified by SKAcz:
-//  added BFEN into save game text, repaired stuff - now added into generated BFEN
-//
-// 2015.03.04 by SKAcz 
-//    FromGameN(bpgntext,ord) ok now
-//    Interface for connecting to chat etc
-//    Board background,color HTML5, Pref allowing change pieces graphic (gif1 .. gif5)
-//    DisabledInput to not focusing and moving chessboard on smartphones and tablets by opening keyboard but holding screen to play or replay
-//    Last move square highligted, repaired enpassant move
-//    DragDrop and click click on any device pc,even android where no mousedown
-// 2015.03 piece.toLowerCase() for valid move fast patch now promoted pawn checking also
-// 2015.03 Load BPGN from disk file, create download link allowing save as text BPGN to disk 
-//202011 BPGNImportRepair1 v001 converting from Chess.com (@d4 into P@d4, {[%clk 0:02:59.9]} into {179.9} )
-//202103 generateRTFTextPosition, RTF double position using bughousechess font
-//202104 repair to load also from wild start positions defined by BFEN 2021 SKAcz 
+
+
 
 function debug() {
 	var tmp = '<form name="debug"><p><textarea name="shit" value="" rows="5" cols="70"></textarea></p></form>';
