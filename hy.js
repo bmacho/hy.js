@@ -4934,7 +4934,7 @@ function drawviewer(color) {
 			tmp += '<tr><td>' + this.drawinfo(color) + '</td></tr>'
 		}; /*drawing info */
 	}
-	tmp += '<tr><td>' + this.drawdebug() + '</td></tr>'
+	tmp += '<tr class="debug"><td>' + this.drawdebug() + '</td></tr>'
 	tmp += '</form> </table> '; /* closing big table */
 	document.writeln(tmp);
 	this.setauleft();
