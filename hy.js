@@ -17,6 +17,21 @@ var viewerversion = '0.43icc.LagPrepIgn001';
 //for example if u wish connect viewer with chat u put here calling chat.fce
 
 
+function log(...args) {
+	// if there is a debugInfo element, it logs there,
+	// otherwise ddebugs into the console.log
+
+	if(document.getElementById("debugInfo")){
+		let outstring = ''
+		for (const arg of args){
+			outstring += JSON.stringify(arg) + " "
+		}
+		document.getElementById("debugInfo").innerHTML += "\n" + outstring
+	} else {
+		console.log(...args)
+	}
+}
+
 function saveNote(game_name_string) {
 	// saves the note to the current positions cNote
 	
@@ -4810,7 +4825,31 @@ function drawinfo(color) {
 	return t;
 }
 
-
+function drawdebug(){
+	var out = ''
+	out += '<a href="javascript:void(0)" onclick="toggleDebugInfo();">Show/hide debug</a>'
+	out += '<script>\
+			function toggleDebugInfo() {\
+				var x = document.getElementById("debugInfo");\
+				if (x.style.display === "block") {\
+					x.style.display = "none";\
+				} else {\
+					x.style.display = "block";\
+				}\
+			}\
+			</script>'
+	out += '<div id="debugInfo" style="\
+				display: block;  /* default visibility of the console, block or none */\
+				width: auto;\
+				padding: 10px 0px 10px 20px;\
+				text-align: left;\
+				background-color: lightgray;\
+				font-family: \'Courier New\', monospace;\
+				white-space: pre;"\
+			>Debug log:\
+			</div>'
+	return out
+}
 
 function drawviewer(color) {
 	var tmp = '';
@@ -4828,6 +4867,7 @@ function drawviewer(color) {
 			tmp += '<tr><td>' + this.drawinfo(color) + '</td></tr>'
 		}; /*drawing info */
 	}
+	tmp += '<tr><td>' + this.drawdebug() + '</td></tr>'
 	tmp += '</form> </table> '; /* closing big table */
 	document.writeln(tmp);
 	this.setauleft();
@@ -5341,6 +5381,7 @@ function game(the_viewer_name, bpgntext, bfen_pos, capture_mode, number_of_board
 	this.drawviewer = drawviewer; /* method that generates html to display the viewer */
 	this.setauleft = setauleft;
 	this.drawinfo = drawinfo;
+	this.drawdebug = drawdebug;
 	this.drawcontrol = drawcontrol;
 	this.otherbd = otherbd;
 	this.execmove = execmove;
