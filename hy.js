@@ -53,7 +53,7 @@
 // 2001-04-21 v1.01 Fermy
 
 
-var viewerversion = '2021-05-06';
+var viewerversion = '2023-06-14';
 
 function log(...args) {
 	// if there is a debugInfo element, it logs there,
@@ -77,149 +77,6 @@ function saveNote(game_name_string) {
 	let game = eval(game_name_string)
 	let v = eval('window.document.' + game_name_string) // textarea doesnt have an id, it only has a name, so we must refer it with DOM objects 
 	game.BPGN[game.currentmove].cNote = v.comment.value// the textarea is called "comment"
-}
-
-
-var ClientLastMadeMove = "00X"; //here will be 10A , 5a, 17B etc.
-var BroadscastMove = false;
-this.eventedmousedown = false;
-
-
-function interfaceLogDebug(text) {
-	document.getElementById('clientdebug').innerHTML += text;
-}
-
-function interfaceOutMove(movefromHyViewer) {
-
-	//chatsendmove is somewhere in page outside viewer
-	document.getElementById('clientdebug').innerHTML += ' OutMyNewMove:' + movefromHyViewer + ',';
-	chatsendmove(movefromHyViewer);
-	ClientLastMadeMove = movefromHyViewer.substring(0, movefromHyViewer.indexOf('.'));
-
-}
-
-function interfaceInUpdateClock(viewer, timeaw, timeab, timebw, timebb) {
-	var v = eval(viewer);
-	v.a.wclock = Math.floor(timeaw / 1000);
-	v.a.bclock = Math.floor(timeab / 1000);
-	v.b.wclock = Math.floor(timebw / 1000);
-	v.b.bclock = Math.floor(timebb / 1000);
-
-	var formm = eval('window.document.' + viewer);
-	if (v.a.flip == 1) {
-		formm.upclocka.value = totime(v.a.wclock);
-		formm.dnclocka.value = totime(v.a.bclock);
-	} else {
-		formm.upclocka.value = totime(v.a.bclock);
-		formm.dnclocka.value = totime(v.a.wclock);
-	}
-
-	if (v.b.flip == 1) {
-		formm.upclockb.value = totime(v.b.wclock);
-		formm.dnclockb.value = totime(v.b.bclock);
-	} else {
-		formm.upclockb.value = totime(v.b.bclock);
-		formm.dnclockb.value = totime(v.b.wclock);
-	}
-
-	document.getElementById('clientdebug').innerHTML += ' TimesF:' + v.a.wclock + ',' + v.a.bclock + ',' + v.b.wclock + ',' + v.b.bclock + ' ';
-	//document.getElementById('clientdebug').innerHTML+='a.ExistsLegalMove(w):'+v.a.ExistsLegalMove('w'); //brx   
-}
-
-function interfaceInUpdateClockAdd(viewer, timeaw, timeab, timebw, timebb) {
-	var v = eval(viewer);
-	v.a.wclock -= timeaw;
-	v.a.bclock -= timeab;
-	v.b.wclock -= timebw;
-	v.b.bclock -= timebb;
-
-	var formm = eval('window.document.' + viewer);
-	if (v.a.flip == 1) {
-		formm.upclocka.value = totime(v.a.wclock);
-		formm.dnclocka.value = totime(v.a.bclock);
-	} else {
-		formm.upclocka.value = totime(v.a.bclock);
-		formm.dnclocka.value = totime(v.a.wclock);
-	}
-
-	if (v.b.flip == 1) {
-		formm.upclockb.value = totime(v.b.wclock);
-		formm.dnclockb.value = totime(v.b.bclock);
-	} else {
-		formm.upclockb.value = totime(v.b.bclock);
-		formm.dnclockb.value = totime(v.b.wclock);
-	}
-}
-
-
-function interfaceInUpdatePlayer(viewer, player, playernick) {
-	var v = eval(viewer);
-	if (player == 'A') v.whitea = playernick
-	else if (player == 'a') v.blacka = playernick
-	else if (player == 'B') v.whiteb = playernick
-	else if (player == 'b') v.blackb = playernick
-
-	var formm = eval('window.document.' + viewer);
-	if (v.a.flip == 1) {
-		formm.upa.value = v.whitea;
-		formm.dna.value = v.blacka;
-	} else {
-		formm.upa.value = v.blacka;
-		formm.dna.value = v.whitea;
-	}
-
-	if (v.b.flip == 1) {
-		formm.upb.value = v.whiteb;
-		formm.dnb.value = v.blackb;
-	} else {
-		formm.upb.value = v.blackb;
-		formm.dnb.value = v.whiteb;
-	}
-
-	document.getElementById('clientdebug').innerHTML += ' Players:' + v.whitea + ',' + v.blacka + ',' + v.whiteb + ',' + v.blackb + ' ';
-}
-
-function interfaceSetTC(viewer, time, delay) {
-	//document.getElementById('clientdebug').innerHTML+=' setTC,';
-}
-
-
-
-function interfaceInEndGame() {
-	//reset all
-	ClientLastMadeMove = "00X";
-
-	//unhighlight all squares
-	for (ind = 0; ind <= 63; ind++) {
-		sqHighlight('a', ind, false);
-		sqHighlight('b', ind, false);
-	}
-}
-
-
-
-function interfaceInMove(movetoHyViewer) {
-	var board;
-
-	if (ClientLastMadeMove == movetoHyViewer.substring(0, movetoHyViewer.indexOf('.'))) { // We already made move on our client board
-		document.getElementById('clientdebug').innerHTML += "InRefusedMove:" + movetoHyViewer + "[" + ClientLastMadeMove + ' vs ' + movetoHyViewer.substring(0, movetoHyViewer.indexOf('.')) + "]" + ",";
-		return;
-	}
-	document.getElementById('clientdebug').innerHTML += " InMove:" + movetoHyViewer + ',';
-
-	//if we dont ,lets make it, but not send to others 
-	//better should be done by parameters than switch global variables 
-	BroadscastMove = false;
-	if (movetoHyViewer.indexOf('.') >= 2) {
-		board = movetoHyViewer.substring(movetoHyViewer.indexOf('.') - 1, movetoHyViewer.indexOf('.')).toLowerCase();
-		assexecmove(movetoHyViewer, board, 'v1');
-	}
-	BroadscastMove = true;
-
-}
-
-function interfacePtell(txtmsg) {
-	socket.emit('sendchat', txtmsg);
 }
 
 
@@ -268,6 +125,28 @@ function unHighlightAll() {
 	
 	this.highlightedSquares = []
 }
+
+
+function setCoordinates() {
+	// sets the coordinates for a board
+	// attached to a and b
+	
+	let bd = this.boardname
+	let flip = this.flip
+	
+	for (let i = 1; i<=8; i++) {
+		let vcoordId  = 'coordinates1' + bd + String(i)
+		let vcholder   = document.getElementById(vcoordId)
+		vcholder.innerHTML = String( !flip ? 8-i+1 : i)
+		
+		let hcoordId  = 'coordinates2' + bd + String(i)
+		let hcholder   = document.getElementById(hcoordId)
+		hcholder.innerHTML = String.fromCharCode( !flip ? i+96 : 105-i)
+	}
+	
+
+}
+
 
 
 
@@ -469,23 +348,6 @@ function readfile(viewer, file) {
 	};
 };
 
-function loadfile() {
-	var i;
-	var n = BPGN_FILE_NAME.length;
-	if (n == 0) {
-		clearInterval(READ_INTERVAL);
-		READ_INTERVAL = false;
-		return;
-	};
-	var tmp = BPGN_FILE_NAME[0];
-	for (i = 0; i < n - 1; i++) BPGN_FILE_NAME[i] = BPGN_FILE_NAME[i + 1];
-	BPGN_FILE_NAME[n - 1] = false;
-	BPGN_FILE_NAME.length = n - 1;
-	if ((!READ_WINDOW) || (READ_WINDOW.closed)) {
-		READ_WINDOW = window.open(BPGN_VIEWER_DIR + 'readfile.shtml?' + tmp, 'bpgnfilereadwindow', 'width=300,height=300');
-	};
-	READ_INTERVAL = setInterval("loadfile();", 100);
-}
 
 function setvar(text) {
 	var i;
@@ -501,28 +363,27 @@ function setvar(text) {
 
 
 function generatesavehtml() {
-	var tmp;
-	tmp = '<html><head><title>Save BPGN</title><link href="fonts/TestWebFontsForBughouseChess2021.css" rel="stylesheet" type="text/css"></head>'
-	tmp += '<body bgcolor="#FFFFFF" text="#000000">';
-	tmp += '<p align="center"><font color="#C0C0C0" size="6">Save BPGN</font></p>';
-	tmp += '<form name="saveform">';
-	tmp += '<p><textarea id="bpgntextarea" name="bpgn" rows="10" cols="80"></textarea></p>';
-	tmp += '<p>' + GenerateSaveTextFile() + '</p>';
-	tmp += '<p><strong>BFEN A:</strong><input type="text" size="70"';
-	tmp += ' name="bfena"></p>';
-	tmp += '<p><strong>BFEN B:</strong><input type="text" size="70"';
-	tmp += ' name="bfenb"></p>';
-	tmp += ' <p>Here is BPGN text for the game and BFEN for the current';
-	tmp += ' position. Cut&amp;Paste them into your favorite text editor';
-	tmp += ' and save. Or download and save it on disk. <br/>Click &quot;Close&quot; button to close this';
-	tmp += ' window. </p>';
-	tmp += '<p><strong>RTF Text of (double) position:</strong></p>';
-	tmp += '<p><textarea class="bughousechess24" id="textareaRTFtextposition" name="RTFtextposition" rows="14" cols="30"></textarea></p>';
-	//tmp+='<p class="bughousechess24">&nbsp;&nbsp;&nbsp;,t,m, , ,  , , , , , ,<br/>>!""""""""#!""""""""# <br/>&nbsp;$t+ +lVg+%$ Kq+ B R% <br/>&nbsp;$OoOvWoPy%$Pn+b+pPp% <br/>&nbsp;$ +m+oOm+%$ +nOp+ +% <br/>&nbsp;$+ +o+ + %$R Op+ + % <br/>&nbsp;$ + P + +%$oW O V +% <br/>&nbsp;$P N PpP %$+ + +m+ % <br/>&nbsp;$ Pp+ +bP%$ Oo+ OoO% <br/>&nbsp;$R BqK + %$T +l+ +t% <br/>&nbsp;/(((((((()/(((((((()<<br/>&nbsp;  , , , ,p,  , , , ,v<br/></p>';
-	tmp += ' <p><input type="button" name="confirm" value="Close"';
-	tmp += ' onclick="window.close();"></p>';
-	tmp += '</form></body></html>';
-	return tmp;
+	
+	return `<html>
+   <head>
+      <title>Save BPGN</title>
+   </head>
+   <body bgcolor="#FFFFFF" text="#000000">
+      <p align="center"><font color="#C0C0C0" size="6">Save BPGN</font></p>
+      <form name="saveform">
+         <p><textarea id="bpgntextarea" name="bpgn" rows="10" cols="80"></textarea></p>
+         <p>
+         ${GenerateSaveTextFile()}
+         </p>
+         <p><strong>BFEN A:</strong><input type="text" size="70" name="bfena"></p>
+         <p><strong>BFEN B:</strong><input type="text" size="70" name="bfenb"></p>
+         <p>Here is BPGN text for the game and BFEN for the current position. Cut&amp;Paste them into your favorite text editor and save. Or download and save it on disk. <br>Click "Close" button to close this window. </p>
+         <p><strong>RTF Text of (double) position:</strong></p>
+         <p><textarea id="textareaRTFtextposition" name="RTFtextposition" rows="14" cols="30"></textarea></p>
+         <p><input type="button" name="confirm" value="Close" onclick="window.close();"></p>
+      </form>
+   </body>
+</html>`
 }
 
 
@@ -1596,7 +1457,7 @@ function generateRTFTextPosition(fiWhiteUp) {
 		*/
 	}
 
-	return res;
+	return "(Not working, pls fix generateRTFTextPosition)";
 }
 
 
@@ -3304,6 +3165,8 @@ function getbpgnheaders(bpgntext) {
 }
 
 function drawboard() /* generates html for the board */ {
+	let flip = this.flip
+
 	var size = this.sqsize;
 	var sqsize = 'width="' + size + 'px" height="' + size + 'px"';
 
@@ -3359,6 +3222,10 @@ function drawboard() /* generates html for the board */ {
 	t += '<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 COLS=8>';
 	for (i = 0; i < 8; i++) {
 		t += '<tr>';
+		
+		{// vertical coordinates
+			t+='<td id="coordinates1'+bd+String(i+1)+'" style="padding: 1px 2px 0 0; text-align: center; font-size:12px;">'+String(!flip ? 7-i+1 : i+1)+'</td>';
+		}		
 		for (j = 0; j < 8; j++) {
 			ind = 8 * i + j;
 			//t+='<td id="tdsquare'+bd+ind+'"'+ ((this.filebg)?'BACKGROUND="':'BGCOLOR="')+ ((i + j) % 2 ? this.gifs["b"] : this.gifs["w"]);
@@ -3378,6 +3245,15 @@ function drawboard() /* generates html for the board */ {
 		/* onMouseDown="assmdown('+ind+",'"+this.viewername+"','"+bd+"');"+'" onMouseUp="assmup('+ind+",'"+this.viewername+"','"+bd+"');"+'" */
 		t += '</tr>';
 	};
+	
+    { // horizontal coordinates
+		t+='<tr id="coords2'+bd+'" style="text-align: center; font-size:12px"><td></td>';
+		for (i=1; i<=8; i++) {
+		  t+='<td style="padding: 2px 0 0 0"; id="coordinates2'+bd+i+'">'+( String.fromCharCode( !flip ? i+96 : 105-i) )+'</td>';
+		}
+		t+='</tr>';
+	}
+	
 	t += '</table>';
 	t.length -= 4;
 	insert(t, t.indexOf("height") + 11, ' name="' + this.viewername + bd + 'uleft">');
@@ -4153,20 +4029,6 @@ function execmove(bd, text) {
 		tmp1 = (mv.board == 'a' && this.a.flip == 0) ||
 			(mv.board == 'b' && this.b.flip == 0);
 
-		//try
-		//{
-
-		// }
-		// catch(err) 
-		// { interfaceLogDebug(err.message);
-		// }       
-
-
-		if (BroadscastMove)
-			interfaceOutMove(nMove + tobpgn(mv));
-		else
-			var brx = 'nic';
-
 		if (tbd.incheck('w', tbd.kingw)) {
 			document.getElementById('clientdebug').innerHTML += " IsCheck";
 		}
@@ -4337,6 +4199,12 @@ function flipboard(viewer) {
 	
 	b_highlights = [...v.b.highlightedSquares]
 	v.b.Highlight(...b_highlights)
+	
+	// handle the coordinates
+	
+	v.a.setCoordinates()
+	v.b.setCoordinates()
+	
 }
 
 
@@ -4866,9 +4734,9 @@ function drawcontrol(color, mode) {
 		t += '<input type="button" value=" &lt;&lt;" onclick="assundomove(' + bc + ',' + "'a','" + this.viewername + "'" + ')">';
 		t += '<input type="button" value=" &lt; " onclick="assundomove(1,' + "'a','" + this.viewername + "'" + ')">';
 
-		t += '<input type="button" value="analyse" onclick="flipped=(window.v1.a.flip) ? \'&flip=true\' : \'\' ; window.open('  ;
-		t += " 'https://online-drophouse-stockfish.herokuapp.com/analysis.html?fen=' + bfen_to_bracket_notation( window.v1.a.generatebfen() )  + flipped " ;
-		t += ",'_blank'" + ')">';
+		t += '<input type="button" value="analyse" onclick="window.open('  ;
+		t += " 'https://online-dropchess-stockfish.onrender.com/analysis.html?fen=' + bfen_to_bracket_notation( window.v1.a.generatebfen() " ;
+		t += "),'_blank'" + ')">';
 		    
 		t += '<input type="button" value=" &gt; " onclick="assforward(1,' + "'a','" + this.viewername + "'" + ',0)">';
 		t += '<input type="button" value="&gt;&gt; " onclick="assforward(' + bc + ',' + "'a','" + this.viewername + "'" + ',0)">';
@@ -4909,9 +4777,9 @@ function drawcontrol(color, mode) {
 		t += '<input type="button" value=" &lt;&lt;" onclick="assundomove(' + bc + ',' + "'b','" + this.viewername + "'" + ')">';
 		t += '<input type="button" value=" &lt; " onclick="assundomove(1,' + "'b','" + this.viewername + "'" + ')">';
 
-		t += '<input type="button" value="analyse" onclick="flipped=(window.v1.b.flip) ? \'&flip=true\' : \'\' ; window.open('  ;
-		t += " 'https://online-drophouse-stockfish.herokuapp.com/analysis.html?fen=' + bfen_to_bracket_notation( window.v1.b.generatebfen() )  + flipped " ;
-		t += ",'_blank'" + ')">';
+		t += '<input type="button" value="analyse" onclick="window.open('  ;
+		t += " 'https://online-dropchess-stockfish.onrender.com/analysis.html?fen=' + bfen_to_bracket_notation( window.v1.b.generatebfen() " ;
+		t += "),'_blank'" + ')">';
 		
 		t += '<input type="button" value=" &gt; " onclick="assforward(1,' + "'b','" + this.viewername + "'" + ',0)">';
 		t += '<input type="button" value="&gt;&gt; " onclick="assforward(' + bc + ',' + "'b','" + this.viewername + "'" + ',0)">';
@@ -5325,6 +5193,8 @@ function board(name, dropbar, gifs, viewername, whitepl, blackpl, welo, belo, di
 	this.Highlight = Highlight
 	this.unHighlightAll = unHighlightAll;
 	this.highlightedSquares = []
+	
+	this.setCoordinates = setCoordinates;
 }
 
 function setmoven() {
